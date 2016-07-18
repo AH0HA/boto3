@@ -62,10 +62,7 @@ response = client.request_spot_instances(
                                 )
 
 
-#for q in ec2.instances.all():
-    #print(q.id);
-    #print(type(q));
-    #response = q.modify_attribute(Groups=[mygroupId]);
+
 
 instances = ec2.instances.filter(
     Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
@@ -73,9 +70,7 @@ for instance in instances:
     print(instance.id, instance.instance_type);
     response = instance.modify_attribute(Groups=[mygroupId]);
     print(response);
-    #respnse = instance.modify_attribute(public_ip_address=myipAddr);
-    #print(response);
-    #response =
+
 
 for instance in instances:
     response = client.associate_address(
@@ -106,36 +101,8 @@ address.associate(myallocId)
 address.association.delete()
 """
 
-#resp=ec2.request_spot_instances(price=myprice, image_id=myimageId, count=mycount, type=mytype ,key_name=mykeyName, instance_type=myinstanceType,subnet_id=mysubnetId )
-
-"""
-#!/home/makayo/.virtualenvs/boto/bin/python
-
-import boto.ec2.connection as conn
-
-#class boto.ec2.connection.EC2Connection
 
 
-#conn = boto.ec2.connect_to_region("us-east-4")
-
-xx=conn.EC2Connection();
-reservations = xx.get_all_instances()  # could limit results with filters
-mystat = xx.get_all_instance_status()
-latest=mystat[len(mystat)-1]
-latestIns=str(latest).split(':')[1]
-
-#cant get allocation id !!!
-#addresses = xx.get_all_addresses()
-#cant get allocation id !!!
-
-#for addr in addresses:
-    #print('%s - %s' % (addr.public_ip, addr.allocation_id)
-
-xx.associate_address(instance_id=latestIns, public_ip=None,allocation_id=myallocId)
-
-#to_do how to find allocation_id given an ip_address ??
-#to_do how to associate a security group with an instance ??
-"""
 
 
 
