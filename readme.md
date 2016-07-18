@@ -1,3 +1,1 @@
-#setup boto3 in virtualenv
-#put .boto in <home_dir> 
-#e.g. /home/makayo
+remind the author how to launch spot-instance, attach security-group & elastic-ip  using boto3
