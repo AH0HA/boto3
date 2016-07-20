@@ -37,9 +37,9 @@ mytype='one-time'
 myipAddr='52.205.199.249'
 myallocId='eipalloc-d22618e8'
 mysecurityGroups=['WebServerSG']
-mydisksize=50
-#mygroupId='sg-14356e6f'
-mygroupId='WebServerSG'
+mydisksize=70
+mygroupId='sg-14356e6f'
+#mygroupId='WebServerSG'
 myzone='us-east-1a'
 myvpcId='vpc-503dba37'
 latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']=mydisksize
@@ -58,8 +58,8 @@ response = client.request_spot_instances(
                                                                 'InstanceType': myinstanceType,
                                                                         'Placement': {
                                                                                         'AvailabilityZone': myzone,
-                                                                                                },
-                                                                        'BlockDeviceMappings':latestAmi.block_device_mappings
+                                                                                                }
+#                                                                        'BlockDeviceMappings':latestAmi.block_device_mappings
 #                                                                                'BlockDeviceMappings': [
 #                                                                                                {
 #                                                                                                                    'Ebs': {
