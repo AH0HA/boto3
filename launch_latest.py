@@ -1,17 +1,34 @@
+
+
 #!/home/makayo/.virtualenvs/boto3/bin/python
+
+
+"""
+#Read the doc!!!
+#http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#EC2.Client.describe_spot_instance_requests
+
+"""
 import boto3
 import time
+
+myid='557612902255'
+
 s = boto3.Session()
 ec2 = s.resource('ec2')
-myid='557612902255'
+client = boto3.client('ec2')
 images = list(ec2.images.filter(Owners=[myid]))
+
 def getdate(datestr):
     ix=datestr.replace('T',' ')
     ix=ix[0:len(ix)-5]
     idx=time.strptime(ix,'%Y-%m-%d %H:%M:%S')
     return(idx)
 zz=sorted(images, key=lambda images: getdate(images.creation_date))
-latestAmi=zz[len(zz)-1]
+
+#last_ami
+myAmi=zz[len(zz)-1]
+#earliest
+#myAmi=latestAmi=zz[0]
 
 """
 [{u'DeviceName': '/dev/sda1',  u'Ebs': {u'DeleteOnTermination': True,   u'Encrypted': False,   u'SnapshotId': 'snap-d8de3adb',   u'VolumeSize': 50,   u'VolumeType': 'gp2'}}]
@@ -19,32 +36,28 @@ latestAmi=zz[len(zz)-1]
 
 
 
-#http://boto3.readthedocs.io/en/latest/guide/migrationec2.html
-#https://gist.github.com/iMilnb/0ff71b44026cfd7894f8
-
-# Let's use Amazon ec2
-#ec2 = boto3.resource('ec2')
-client = boto3.client('ec2')
-
 #myimageId='ami-42870a55'
-myimageId=latestAmi.id
+myimageId=myAmi.id
+print myimageId
 mysubnetId='subnet-80cdeed8'
-myinstanceType='c4.2xlarge'
+myinstanceType='c4.4xlarge'
 mykeyName='spot-coursera'
-mycount=1
+#make sure ajust this but dont do multiple in a loop as it can fail!!!
+mycount=2
+#make sure ajust this but dont do multiple in a loop as it can fail!!!
 myprice='5.0'
 mytype='one-time'
 myipAddr='52.205.199.249'
 myallocId='eipalloc-d22618e8'
 mysecurityGroups=['WebServerSG']
-mydisksize=70
+#mydisksize=70
 mygroupId='sg-14356e6f'
 #mygroupId='WebServerSG'
 myzone='us-east-1a'
 myvpcId='vpc-503dba37'
-latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']=mydisksize
+#latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']=mydisksize
 #diskSpec=latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']
-response = client.request_spot_instances(
+response2 = client.request_spot_instances(
             DryRun=False,
                 SpotPrice=myprice,
                     ClientToken='string',
@@ -59,31 +72,44 @@ response = client.request_spot_instances(
                                                                         'Placement': {
                                                                                         'AvailabilityZone': myzone,
                                                                                                 }
-#                                                                        'BlockDeviceMappings':latestAmi.block_device_mappings
-#                                                                                'BlockDeviceMappings': [
-#                                                                                                {
-#                                                                                                                    'Ebs': {
-#                                                                                                                                            'SnapshotId': 'snap-f70deff0',
-#                                                                                                                                                                'VolumeSize': 100,
-#                                                                                                                                                                                    'DeleteOnTermination': True,
-#                                                                                                                                                                                                        'VolumeType': 'gp2',
-#                                                                                                                                                                                                                            'Iops': 300,
-#                                                                                                                                                                                                                                                'Encrypted': False
-#                                                                                                                                                                                                                                                                },
-#                                                                                                                                },
-#                                                                                                        ],
-#
-#                                                                                        'EbsOptimized': True,
-#                                                                                                'Monitoring': {
-#                                                                                                                'Enabled': True
-#                                                                                                                        },
-#                                                                                                        'SecurityGroupIds': [
-#                                                                                                                        'sg-709f8709',
-#                                                                                                                                ]
-                                                                                                            }
-                                )
 
-print(response)
+                                                     }
+                                         )
+
+#print(response2)
+myrequestId=response2['SpotInstanceRequests'][0]['SpotInstanceRequestId']
+
+import time
+XX=True
+while XX:
+    response3 = client.describe_spot_instance_requests(
+        #DryRun=True,
+        SpotInstanceRequestIds=[
+        myrequestId,
+    ]
+    #Filters=[
+     #   {
+      #      'Name': 'string',
+       #     'Values': [
+        #        'string',
+         #   ]
+        #},
+    #]
+    )
+    #print(response3)
+    request_status=response3['SpotInstanceRequests'][0]['Status']['Code']
+    if(request_status=='fullfilled'):
+        print myrequestId,request_status
+        XX=False;
+    elif ('pending' in request_status):
+        print myrequestId,request_status
+        time.sleep(5)
+    else:
+        XX=False
+        print myrequestId,request_status
+
+
+"""
 instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 while( len(list(instances))==0):
     instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
@@ -111,7 +137,7 @@ for instance in instances:
     );
     print (response);
 
-
+"""
 # Boto 3
 """
 gateway.attach_to_vpc(VpcId=vpc.id)
