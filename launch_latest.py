@@ -18,17 +18,21 @@ ec2 = s.resource('ec2')
 client = boto3.client('ec2')
 images = list(ec2.images.filter(Owners=[myid]))
 
+
 def getdate(datestr):
     ix=datestr.replace('T',' ')
     ix=ix[0:len(ix)-5]
     idx=time.strptime(ix,'%Y-%m-%d %H:%M:%S')
     return(idx)
-zz=sorted(images, key=lambda images: getdate(images.creation_date))
 
+
+#get the latest ami
+zz=sorted(images, key=lambda images: getdate(images.creation_date))
 #last_ami
 myAmi=zz[len(zz)-1]
 #earliest
 #myAmi=latestAmi=zz[0]
+#get the latest ami
 
 """
 [{u'DeviceName': '/dev/sda1',  u'Ebs': {u'DeleteOnTermination': True,   u'Encrypted': False,   u'SnapshotId': 'snap-d8de3adb',   u'VolumeSize': 50,   u'VolumeType': 'gp2'}}]
@@ -39,22 +43,40 @@ myAmi=zz[len(zz)-1]
 #myimageId='ami-42870a55'
 myimageId=myAmi.id
 print myimageId
-mysubnetId='subnet-80cdeed8'
-myinstanceType='c4.4xlarge'
+#atomic
+#myzone='us-east-1a'
+#mysubnetId='subnet-80cdeed8'
+#myvpcId='vpc-503dba37'
+#mygroupId='sg-14356e6f'
+#mysecurityGroups=['WebServerSG']
+#atomic
+
+#atomic
+myvpcId='vpc-2fac3d48'
+myzone='us-east-1e'
+mysubnetId='subnet-79ad9a53'
+mygroupId='sg-e3171798'
+mysecurityGroups=['us-east-1e-security']
+#atomic
+
+#us-east-1e-VPC-subnet
+myinstanceType='c4.2xlarge'
 mykeyName='spot-coursera'
-#make sure ajust this but dont do multiple in a loop as it can fail!!!
-mycount=2
-#make sure ajust this but dont do multiple in a loop as it can fail!!!
+#make sure just once but dont do multiple in a loop as it can fail!!!
+mycount=1
+#make sure just once but dont do multiple in a loop as it can fail!!!
 myprice='5.0'
 mytype='one-time'
 myipAddr='52.205.199.249'
 myallocId='eipalloc-d22618e8'
-mysecurityGroups=['WebServerSG']
 #mydisksize=70
-mygroupId='sg-14356e6f'
 #mygroupId='WebServerSG'
-myzone='us-east-1a'
-myvpcId='vpc-503dba37'
+
+
+
+
+
+
 #latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']=mydisksize
 #diskSpec=latestAmi.block_device_mappings[0]['Ebs']['VolumeSize']
 response2 = client.request_spot_instances(
