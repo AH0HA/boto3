@@ -44,19 +44,19 @@ myAmi=zz[len(zz)-1]
 myimageId=myAmi.id
 print myimageId
 #atomic
-#myzone='us-east-1a'
-#mysubnetId='subnet-80cdeed8'
-#myvpcId='vpc-503dba37'
-#mygroupId='sg-14356e6f'
-#mysecurityGroups=['WebServerSG']
+myzone='us-east-1a'
+mysubnetId='subnet-80cdeed8'
+myvpcId='vpc-503dba37'
+mygroupId='sg-14356e6f'
+mysecurityGroups=['WebServerSG']
 #atomic
 
 #atomic
-myvpcId='vpc-2fac3d48'
-myzone='us-east-1e'
-mysubnetId='subnet-79ad9a53'
-mygroupId='sg-e3171798'
-mysecurityGroups=['us-east-1e-security']
+#myvpcId='vpc-2fac3d48'
+#myzone='us-east-1e'
+#mysubnetId='subnet-79ad9a53'
+#mygroupId='sg-e3171798'
+#mysecurityGroups=['us-east-1e-security']
 #atomic
 
 #us-east-1e-VPC-subnet
@@ -107,7 +107,7 @@ while XX:
     response3 = client.describe_spot_instance_requests(
         #DryRun=True,
         SpotInstanceRequestIds=[
-        myrequestId,
+        myrequestId
     ]
     #Filters=[
      #   {
@@ -130,6 +130,26 @@ while XX:
         XX=False
         print myrequestId,request_status
 
+
+myins=response3['SpotInstanceRequests'][0]['InstanceId']
+instance = ec2.Instance(myins)
+response4 = instance.modify_attribute(Groups=[mygroupId]);
+
+response5 = client.associate_address(
+        #DryRun=True|False,
+        DryRun=False,
+        #InstanceId='string',
+        InstanceId=myins,
+        #PublicIp='string',
+        #AllocationId='string',
+        AllocationId=myallocId,
+        #NetworkInterfaceId='string',
+        #PrivateIpAddress='string',
+        #AllowReassociation=True|False
+        AllowReassociation=True
+)
+
+#instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
 
 """
 instances = ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])
